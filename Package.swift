@@ -16,8 +16,8 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/your-org/SFBAudioEngine.git", from: "1.0.0"),
-        .package(url: "https://github.com/your-org/SwiftOgg.git", from: "1.0.0")
+        .package(url: "https://github.com/sbooth/SFBAudioEngine.git", from: "0.7.1"),
+        .package(url: "https://github.com/element-hq/swift-ogg", from: "0.0.3")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
