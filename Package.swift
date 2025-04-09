@@ -26,7 +26,7 @@ let package = Package(
             name: "AudioEngine",
             dependencies: [
                 "SFBAudioEngine",
-                "SwiftOgg"
+                .product(name: "SwiftOGG", package: "swift-ogg"),
             ],
             path: "Sources/AudioEngine"
         ),
