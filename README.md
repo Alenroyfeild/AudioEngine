@@ -35,7 +35,7 @@ Add the following to your `Package.swift`:
 Or via Xcode:
 
 1. Go to **File > Add Packages**
-2. Enter the repo URL: `https://github.com/your-org/AudioEngine.git`
+2. Enter the repo URL: `https://github.com/Alenroyfeild/AudioEngine.git`
 3. Choose your version and target
 4. Finish integration
 
