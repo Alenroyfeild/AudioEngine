@@ -29,7 +29,7 @@ Built on top of powerful open-source libraries like **SFBAudioEngine** and **Swi
 Add the following to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/your-org/AudioEngine.git", from: "0.0.1")
+.package(url: "https://github.com/Alenroyfeild/AudioEngine.git", from: "0.0.1")
 ```
 
 Or via Xcode:
