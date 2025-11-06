@@ -1,0 +1,25 @@
+{
+    "schemaMajor": 1,
+    "schemaMinor": 0,
+    "name": "AudioEngine",
+    "version": "1.0.0",
+    "overview": "AudioEngine SDK is a lightweight, high-performance iOS framework that brings robust audio format conversion capabilities to your app—particularly for formats that Apple does not support natively, such as OGG, OGA, and MPEG.\nBuilt on top of powerful open-source libraries like SFBAudioEngine and SwiftOgg, this SDK makes it easy to convert, encode, and decode a wide range of audio formats for both playback and processing.",
+    "authors": [
+        {
+            "name": "BalajiRoyal",
+            "email": "balajiroyalterla007@gmal.com"
+        }
+    ],
+    "keywords": [
+        "sdk",
+        "ios",
+        "ogg",
+        "SwiftOgg",
+        "AudioEngine",
+        "converter"
+    ],
+    "links": {
+        "homepage": "https://github.com/Alenroyfeild/AudioEngine/blob/main/README.md",
+        "repository": "https://github.com/Alenroyfeild/AudioEngine.git"
+    }
+}
