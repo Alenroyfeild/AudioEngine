@@ -1,164 +1,92 @@
-# 🎧 AudioEngine SDK – Advanced Audio Conversion for iOS
+# AudioEngine
 
-**AudioEngine SDK** is a lightweight, high-performance iOS framework that brings robust **audio format conversion** capabilities to your app—particularly for formats that Apple does **not support natively**, such as **OGG**, **OGA**, and **MPEG**.
+AudioEngine is a small iOS Swift package that presents one request-based API for audio conversion. It routes OGG/OGA input through [`swift-ogg`](https://github.com/element-hq/swift-ogg) and other declared formats through [`SFBAudioEngine`](https://github.com/sbooth/SFBAudioEngine).
 
-Built on top of powerful open-source libraries like **SFBAudioEngine** and **SwiftOgg**, this SDK makes it easy to **convert, encode, and decode** a wide range of audio formats for both playback and processing.
+This repository is a focused wrapper and learning project. It does not claim to replace the underlying codec libraries or provide benchmarked performance guarantees.
 
----
+## What it demonstrates
 
-## 🚀 Features
+- Swift Package Manager library design
+- An async, throwing conversion boundary
+- A builder that validates required input and creates a default output URL
+- Format-specific routing and typed errors
+- Dependency-backed audio conversion without exposing dependency APIs to callers
 
-- 🔄 **Bidirectional Format Conversion**
-  - Convert `.m4a`, `.wav` ➝ `.mp3`, `.ogg`
-  - Convert `.ogg`, `.oga`, `.mpeg` ➝ `.mp3`, `.m4a`
+## Requirements
 
-- ⚙️ **Powered by Proven Libraries**
-  - 🎧 **SFBAudioEngine**: High-quality encoding and decoding for MP3 and other popular formats
-  - 🌀 **SwiftOgg**: Native support for Ogg and Oga formats
+- iOS 15+
+- Swift 5.7+
+- Xcode 14+
 
-- 📱 **Seamless Integration**
-  - Optimized for use in any iOS app requiring audio format compatibility
-  - Straightforward API for converting files with minimal setup
+## Installation
 
----
+In Xcode, select **File → Add Package Dependencies** and enter:
 
-## 📦 Installation
-
-### Swift Package Manager (Recommended)
-
-Add the following to your `Package.swift`:
-
-```swift
-.package(url: "https://github.com/Alenroyfeild/AudioEngine.git", from: "0.0.1")
+```text
+https://github.com/Alenroyfeild/AudioEngine.git
 ```
 
-Or via Xcode:
+The repository does not currently publish a tagged semantic version. When adding it, select the `main` branch or pin an exact commit. A tagged release should be preferred once one is available.
 
-1. Go to **File > Add Packages**
-2. Enter the repo URL: `https://github.com/Alenroyfeild/AudioEngine.git`
-3. Choose your version and target
-4. Finish integration
-
-> ✅ The SDK internally uses `SFBAudioEngine` and `SwiftOgg` for codec support — no extra configuration is required.
-
----
-
-## 📌 Why Use AudioEngine SDK?
-
-### ❌ Native iOS Limitations:
-- No built-in support for **OGG**, **OGA**, and some **MPEG** formats
-- Cannot **encode to MP3**
-- `.m4a` (default iOS format) isn’t ideal for cross-platform use
-
-### ✅ AudioEngine SDK Solves This By:
-- Supporting conversion of audio to widely used formats like **MP3** and **OGG**
-- Enabling your app to **play, upload, or share** non-native formats
-- Offering a clean and modern API to handle audio format needs effortlessly
-
----
-
-## 🔁 Example Conversion Scenarios
-
-| Use Case              | Conversion Path                  |
-|-----------------------|----------------------------------|
-| Playback Support      | `.ogg`, `.mpeg` ➝ `.mp3`         |
-| Upload Compatibility  | `.m4a`, `.wav` ➝ `.mp3`, `.ogg`  |
-| Audio Processing      | Any ➝ Target format of choice    |
-
----
-
-## 🧱 Usage
-
-### Option 1: Manual Request Initialization
+## Usage
 
 ```swift
-let request = AudioConversionRequest(
-    sourceURL: inputFileURL,
-    inputFormat: .wav,
-    outputFormat: .mp3,
-    outputURL: outputFileURL
-)
+import AudioEngine
 
-try AudioEngine.shared.convert(request)
+let request = try AudioConversionRequestBuilder()
+    .setSourceURL(inputURL)
+    .setInputFormat(.wav)
+    .setOutputFormat(.mp3)
+    .setOutputURL(outputURL)
+    .build()
+
+let didConvert = try await AudioEngine.convert(request: request)
 ```
 
-### Option 2: Using the Builder Pattern (Recommended)
+For OGG/OGA input, the builder fixes the output format to M4A:
 
 ```swift
 let request = try AudioConversionRequestBuilder()
-    .setSourceURL(inputFileURL)
+    .setSourceURL(oggURL)
     .setInputFormat(.ogg)
     .build()
 
-try AudioEngine.shared.convert(request)
+try await AudioEngine.convert(request: request)
 ```
 
-> ℹ️ **Note:** If the input format is `.ogg` or `.oga`, the output format is automatically set to `.m4a` and cannot be changed.
+When no output URL is supplied, the builder writes beside the source using `<name>_converted.<extension>`.
 
-### Optional: Set Output Format and Output URL
+## Declared formats and routing
 
-```swift
-let request = try AudioConversionRequestBuilder()
-    .setSourceURL(inputFileURL)
-    .setInputFormat(.wav)
-    .setOutputFormat(.mp3)
-    .setOutputURL(customOutputURL)
-    .build()
+| Input | Requested output | Route |
+| --- | --- | --- |
+| OGG, OGA | M4A (enforced) | `swift-ogg` |
+| M4A, MP3, WAV, MPEG, AMR | Caller-selected declared format | `SFBAudioEngine` |
+
+Actual codec support depends on the underlying libraries and the audio content. A declared enum case is not a guarantee that every codec/container combination will convert successfully; failures are surfaced as `AudioEngineError`.
+
+## Design
+
+```text
+AudioConversionRequestBuilder
+        ↓ validates and supplies defaults
+AudioConversionRequest
+        ↓
+AudioEngine.convert(request:)
+        ├── OGG / OGA → swift-ogg → M4A
+        └── other input → SFBAudioEngine AudioConverter
 ```
 
----
+## Tests
 
-## ⚙️ Format Handling Rules
+The test target covers request-builder rules that do not require audio fixtures:
 
-- `.ogg` and `.oga` inputs:
-  - Output format is **forced to `.m4a`**
-  - Attempting to override will be ignored
-- If `outputURL` is not set:
-  - A default file will be generated in the same directory, with a `_converted` suffix
+```bash
+swift test
+```
 
----
+End-to-end codec tests with licensed fixture files are still to be added. See this as a transparent limitation, not an implied guarantee.
 
-## ✅ Benefits
+## License
 
-- 🧩 **Fills a Native Gap** – Adds support for audio formats missing on iOS
-- ⚡ **Fast & Efficient** – Optimized for large audio files
-- 🧪 **Production Ready** – Verified in real-world use cases
-- 🛠️ **Extensible** – Easily fits into any audio pipeline
-
----
-
-## 📂 Perfect For
-
-- 🎙️ Audio recording or podcast apps
-- 📤 Media upload and sharing tools
-- 🎛️ Custom audio processing utilities
-- 📱 Any iOS app needing format compatibility
-
----
-
-## 🔐 Licensing & Maintenance
-
-- ✅ Fully approved under licenses compatible with commercial apps
-- 🔄 Maintained for compatibility with latest iOS versions
-- 🛡️ Built-in error handling and fallbacks reduce failure risk
-
----
-
-## 📣 Coming Soon
-
-- 📊 Conversion progress monitoring
-- 📁 Batch conversion API
-- 🎚️ Output quality presets
-
----
-
-## 💬 Need Help?
-
-Open an issue or reach out to the maintainers via GitHub Discussions.
-
----
-
-**AudioEngine SDK** gives you full control over audio formats—making your app more compatible, more powerful, and future-proof.
-
----
-
+AudioEngine is available under the [MIT License](LICENSE). Applications must also comply with the licenses of `SFBAudioEngine`, `swift-ogg`, and the codecs they use.
