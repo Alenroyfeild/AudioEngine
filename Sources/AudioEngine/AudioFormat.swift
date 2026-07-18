@@ -8,7 +8,7 @@
 /// Represents supported audio formats for conversion operations.
 ///
 /// Each case in `AudioFormat` corresponds to a commonly used audio format that can be used as an input or output in audio conversion processes.
-public enum AudioFormat: String, CaseIterable {
+public enum AudioFormat: String, CaseIterable, Equatable {
     /// MPEG-4 Audio format (.m4a)
     case m4a
     /// MPEG Layer III Audio format (.mp3)
@@ -45,4 +45,3 @@ public enum AudioFormat: String, CaseIterable {
         }
     }
 }
-
